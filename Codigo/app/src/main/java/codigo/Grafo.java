@@ -101,8 +101,7 @@ class Grafo {
                 if (adj[j].contains(i))
                     antibase.add(j);
             }
-            System.out.println("Base of " + i + ": " + base);
-            System.out.println("Antibase of " + i + ": " + antibase);
+            //System.out.println("Bases de " + i + ": " + base + "Antibases de " + i + ": " + antibase);
         }
     }
 }
