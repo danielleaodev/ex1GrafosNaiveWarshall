@@ -26,6 +26,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
+    applicationDefaultJvmArgs = ["-Xms1g", "-Xmx4g"]
     mainClass = 'codigo.App'
 }
 

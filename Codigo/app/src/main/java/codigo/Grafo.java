@@ -9,44 +9,72 @@ import java.util.*;
 
 class Grafo {
     private int V;
-    private LinkedList<Integer> adj[];
-    private Set<Par> arestas;
+    private boolean[][] adj;
 
+    /**
+    * Cria um novo Grafo com um número específico de vértices.
+    *
+    * @param v o número de vértices do grafo.
+    */
     Grafo(int v) {
         V = v;
-        adj = new LinkedList[v];
-        arestas = new HashSet<>();
-        for (int i=0; i<v; ++i)
-            adj[i] = new LinkedList();
+        adj = new boolean[V][V];
     }
 
+    /**
+    * Adiciona uma aresta ao grafo.
+    *
+    * @param v o vértice de origem da aresta.
+    * @param w o vértice de destino da aresta.
+    */
     void addAresta(int v, int w) {
-        Par aresta = new Par(v, w);
-        if (!arestas.contains(aresta)) {
-            adj[v].add(w);
-            arestas.add(aresta);
-        }
+        adj[v][w] = true;
     }
 
+    /**
+    * Gera um grafo aleatório com um número específico de arestas.
+    *
+    * @param numArestas o número de arestas do grafo.
+    */
     void generateRandomGraph(int numArestas) {
         Random rand = new Random();
-        while (arestas.size() < numArestas) {
+        int count = 0;
+        while (count < numArestas) {
             int src = rand.nextInt(V);
             int dest = rand.nextInt(V);
-            addAresta(src, dest);
-        }
-    }
-
-    void saveGraphToFile(String filename) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            for (Par aresta : arestas) {
-                writer.write(aresta.v + " " + aresta.w);
-                writer.newLine();
+            if (!adj[src][dest]) {
+                addAresta(src, dest);
+                count++;
             }
         }
     }
 
-    void loadGraphFromFile(String filename) throws IOException {
+    /**
+    * Salva o grafo em um arquivo de texto.
+    *
+    * @param filename o nome do arquivo onde o grafo será salvo.
+    * @throws IOException se ocorrer um erro durante a escrita do arquivo.
+    */
+    void salvarGrafoParaArquivo(String filename) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (int v = 0; v < V; v++) {
+                for (int w = 0; w < V; w++) {
+                    if (adj[v][w]) {
+                        writer.write(v + " " + w);
+                        writer.newLine();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+    * Carrega um grafo a partir de um arquivo de texto.
+    *
+    * @param filename o nome do arquivo a partir do qual o grafo será carregado.
+    * @throws IOException se ocorrer um erro durante a leitura do arquivo.
+    */
+    void carregarGrafoDeArquivo(String filename) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -57,30 +85,35 @@ class Grafo {
             }
         }
     }
-    
+
     void naiveSearch() {
         for (int i = 0; i < V; i++) {
-            boolean visited[] = new boolean[V];
+            boolean[] visited = new boolean[V];
             DFS(i, visited);
         }
     }
 
-    void DFS(int v, boolean visited[]) {
+    /**
+    * Executa uma busca em profundidade a partir de um vértice específico.
+    *
+    * @param v o vértice de onde a busca começará.
+    * @param visited o conjunto de vértices visitados.
+    */
+    void DFS(int v, boolean[] visited) {
         visited[v] = true;
-        Iterator<Integer> i = adj[v].listIterator();
-        while (i.hasNext()) {
-            int n = i.next();
-            if (!visited[n])
+        for (int n = 0; n < V; n++) {
+            if (adj[v][n] && !visited[n]) {
                 DFS(n, visited);
+            }
         }
     }
 
     void warshall() {
-        boolean reach[][] = new boolean[V][V];
+        boolean[][] reach = new boolean[V][V];
 
-        for (int i = 0; i < V; i++)
-            for (int j = 0; j < V; j++)
-                reach[i][j] = adj[i].contains(j);
+        for (int i = 0; i < V; i++) {
+            System.arraycopy(adj[i], 0, reach[i], 0, V);
+        }
 
         for (int k = 0; k < V; k++) {
             for (int i = 0; i < V; i++) {
@@ -91,17 +124,22 @@ class Grafo {
         }
     }
 
-    void findBaseAndAntiBase() {
+    /**
+    * Encontra a base e a antibase do grafo.
+    */
+    void AcharBaseEAntiBase() {
         for (int i = 0; i < V; i++) {
-            LinkedList<Integer> base = new LinkedList<>();
-            LinkedList<Integer> antibase = new LinkedList<>();
+            Set<Integer> base = new HashSet<>();
+            Set<Integer> antibase = new HashSet<>();
             for (int j = 0; j < V; j++) {
-                if (adj[i].contains(j))
+                if (adj[i][j]) {
                     base.add(j);
-                if (adj[j].contains(i))
+                }
+                if (adj[j][i]) {
                     antibase.add(j);
+                }
             }
-            //System.out.println("Bases de " + i + ": " + base + "Antibases de " + i + ": " + antibase);
+            //System.out.println("Bases de " + i + ": " + base + "\nAntibases de " + i + ": " + antibase);
         }
     }
 }

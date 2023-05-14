@@ -7,77 +7,71 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App {
 
-    private static final String grafo100 = "grafo_100.txt";
-    private static final String grafo1000 = "grafo_1000.txt";
-    private static final String grafo10000 = "grafo_10000.txt";
-    private static final String grafo100000 = "grafo_100000.txt";
 
+    private static final String[] grafos = {"grafo_100.txt", "grafo_1000.txt", "grafo_10000.txt", "grafo100000.txt"};
     public static void main(String args[]) {
-
 
 
         long startTime, endTime;
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Digite o número de vértices:");
-        int V = scanner.nextInt();
-        System.out.println("Digite o número de arestas:");
-        int E = scanner.nextInt();
+        for(int v = 100; v != 1000000; v = 10*v) {
 
-        Grafo g = new Grafo(V);
-        g.generateRandomGraph(E);
+            Grafo g = new Grafo(v);
+            int a = (v*100);
+            g.generateRandomGraph(a);
+    
+            System.out.println("Grafo gerado com " + v + " vértices e " + a + " arestas.");
 
-        System.out.println("Grafo gerado com " + V + " vértices e " + E + " arestas.");
+            // Salvando o grafo em um arquivo
+            try {
+                g.salvarGrafoParaArquivo("grafo_"+v+".txt");
+                System.out.println("Grafo salvo em "+ "grafo_"+v+".txt");
+            } catch (IOException e) {
+                System.out.println("Erro ao salvar o grafo: " + e.getMessage());
+            } 
 
-        // Salvando o grafo em um arquivo
-        try {
-            g.saveGraphToFile(grafo10000);
-            System.out.println("Grafo salvo em "+ grafo10000);
-        } catch (IOException e) {
-            System.out.println("Erro ao salvar o grafo: " + e.getMessage());
-        }
+            // Carregando o grafo de um arquivo
+            Grafo g1 = new Grafo(v);
+            try {
+                g1.carregarGrafoDeArquivo("grafo_"+v+".txt");
+                System.out.println("Grafo carregado de "+ "grafo_"+v+".txt");
+            } catch (IOException e) {
+                System.out.println("Erro ao carregar o grafo: " + e.getMessage());
+            }
 
-        // Carregando o grafo de um arquivo
-        Grafo g1 = new Grafo(V);
-        try {
-            g1.loadGraphFromFile(grafo10000);
-            System.out.println("Grafo carregado de "+ grafo10000);
-        } catch (IOException e) {
-            System.out.println("Erro ao carregar o grafo: " + e.getMessage());
-        }
+            startTime = System.nanoTime();
+            g1.warshall();
+            endTime = System.nanoTime();
+            System.out.println("Tempo gasto para o algoritmo de Warshall: " + (endTime - startTime) + " nanosegundos");
 
-        Grafo g2 = new Grafo(V);
-        try {
-            g2.loadGraphFromFile(grafo10000);
-            System.out.println("Grafo carregado de "+ grafo10000);
-        } catch (IOException e) {
-            System.out.println("Erro ao carregar o grafo: " + e.getMessage());
-        }
+            startTime = System.nanoTime();
+            g1.AcharBaseEAntiBase();
+            endTime = System.nanoTime();
+            System.out.println("Tempo gasto para encontrar a base e antibase: " + (endTime - startTime) + " nanosegundos");
+    
+            Grafo g2 = new Grafo(v);
+            try {
+                g2.carregarGrafoDeArquivo("grafo_"+v+".txt");
+                System.out.println("Grafo carregado de "+ "grafo_"+v+".txt");
+            } catch (IOException e) {
+                System.out.println("Erro ao carregar o grafo: " + e.getMessage());
+            }
 
-        startTime = System.nanoTime();
-        g2.naiveSearch();
-        endTime = System.nanoTime();
-        System.out.println("Tempo gasto para a busca naive: " + (endTime - startTime) + " nanosegundos");
+            startTime = System.nanoTime();
+            g2.naiveSearch();
+            endTime = System.nanoTime();
+            System.out.println("Tempo gasto para a busca naive: " + (endTime - startTime) + " nanosegundos");
 
-        startTime = System.nanoTime();
-        g2.findBaseAndAntiBase();
-        endTime = System.nanoTime();
-        System.out.println("Tempo gasto para encontrar a base e antibase: " + (endTime - startTime) + " nanosegundos");
- 
-        startTime = System.nanoTime();
-        g1.warshall();
-        endTime = System.nanoTime();
-        System.out.println("Tempo gasto para o algoritmo de Warshall: " + (endTime - startTime) + " nanosegundos");
-
-        startTime = System.nanoTime();
-        g1.findBaseAndAntiBase();
-        endTime = System.nanoTime();
-        System.out.println("Tempo gasto para encontrar a base e antibase: " + (endTime - startTime) + " nanosegundos");
+            startTime = System.nanoTime();
+            g2.AcharBaseEAntiBase();
+            endTime = System.nanoTime();
+            System.out.println("Tempo gasto para encontrar a base e antibase: " + (endTime - startTime) + " nanosegundos");
+    
+            }
     }
 }
-
-    
