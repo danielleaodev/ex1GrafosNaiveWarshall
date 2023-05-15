@@ -1,0 +1,188 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{caption}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{attachfile2}
+
+% Definindo o estilo do código
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  columns=fullflexible,
+  breaklines=true,
+  breakatwhitespace=false,
+  showstringspaces=false,
+  captionpos=b,
+  frame=single,
+  numbers=left,
+  numbersep=5pt,
+  numberstyle=\tiny\color{mygray},
+}
+
+\geometry{a4paper, margin=2cm}
+
+\title{Análise dos Algoritmos Naive e Warshall para Encontrar Bases e Antibases com Fecho Transitivo}
+\author{Daniel de Rezende Leão, Caio Elias Rodrigues Araujo, Victor de Souza Friche Passos}
+
+\begin{document}
+\maketitle
+
+\href{https://github.com/danielrleao/ex1GrafosNaiveWarshall}{Link para o Repositório no GitHub}\
+
+\section{Introdução}
+\par    Neste trabalho, apresentamos a análise dos algoritmos Naive e Warshall para encontrar bases e antibases com fecho transitivo em um grafo. A motivação para este estudo foi o Trabalho 1 da disciplina de Teoria dos Grafos e Computabilidade, ministrada pelo professor Zenilton Kleber Gonçalves do Patrocínio Júnior, no curso de Engenharia de Software da Pontifícia Universidade Católica de Minas Gerais.
+\vspace{10pt} % Espaço vertical de 10 pontos
+\par Utilizamos uma matriz de adjacência para representar o grafo, onde cada elemento da matriz indica a presença de uma aresta entre dois vértices. Essa escolha foi feita devido à simplicidade de implementação e à facilidade de visualização das relações entre os vértices.
+\vspace{10pt} % Espaço vertical de 10 pontos
+\par Durante nossa análise, nos deparamos com alguns problemas sem solução em relação à eficiência dos algoritmos. A complexidade desses algoritmos pode se tornar impraticável quando aplicados em grafos de grande escala, especialmente quando o número de vértices é muito superior ao número de arestas.
+\vspace{10pt} % Espaço vertical de 10 pontos
+\par Neste relatório, descreveremos os algoritmos Naive e Warshall, suas implementações em Java, análise de complexidade e compararemos seus tempos de execução em diferentes grafos. Além disso, discutiremos os resultados obtidos e faremos considerações sobre a eficiência e eficácia desses algoritmos.
+
+
+
+
+\section{Algoritmo Naive}
+
+% Descrição do algoritmo Naive para encontrar bases e antibases com fecho transitivo
+
+\subsection{Implementação}
+
+% Trecho de código do algoritmo Naive em Java
+
+\begin{lstlisting}[language=Java, caption=Implementação do algoritmo Naive]
+    void naiveSearch() {
+        for (int i = 0; i < V; i++) {
+            boolean[] visited = new boolean[V];
+            DFS(i, visited);
+        }
+    }
+
+    /**
+    * Executa uma busca em profundidade a partir de um vértice específico.
+    *
+    * @param v o vértice de onde a busca começará.
+    * @param visited o conjunto de vértices visitados.
+    */
+    void DFS(int v, boolean[] visited) {
+        visited[v] = true;
+        for (int n = 0; n < V; n++) {
+            if (adj[v][n] && !visited[n]) {
+                DFS(n, visited);
+            }
+        }
+    }
+\end{lstlisting}
+
+\subsection{Análise de Complexidade}
+\vspace{10pt} % Espaço vertical de 10 pontos
+    A complexidade do algoritmo Naive é dada por: O(V³)
+    \vspace{10pt} % Espaço vertical de 10 pontos
+    
+    \par Isso ocorre porque o algoritmo realiza um loop aninhado triplo para cada vértice do grafo, resultando em uma complexidade cúbica em relação ao número de vértices.
+
+\section{Algoritmo Warshall}
+
+% Descrição do algoritmo Warshall para encontrar bases e antibases com fecho transitivo
+
+\subsection{Implementação}
+
+% Trecho de código do algoritmo Warshall em Java
+
+\begin{lstlisting}[language=Java, caption=Implementação do algoritmo Warshall]
+    void warshall() {
+        boolean[][] reach = new boolean[V][V];
+
+        for (int i = 0; i < V; i++) {
+            System.arraycopy(adj[i], 0, reach[i], 0, V);
+        }
+
+        for (int k = 0; k < V; k++) {
+            for (int i = 0; i < V; i++) {
+                for (int j = 0; j < V; j++) {
+                    reach[i][j] = reach[i][j] || (reach[i][k] && reach[k][j]);
+                }
+            }
+        }
+    }
+\end{lstlisting}
+
+\subsection{Análise de Complexidade}
+
+A complexidade do algoritmo Warshall é dada por: O(V³)
+\vspace{10pt} % Espaço vertical de 10 pontos
+\par Assim como o algoritmo Naive, o algoritmo Warshall também possui uma complexidade cúbica em relação ao número de vértices do grafo. Ele realiza um loop aninhado triplo para cada vértice do grafo, tornando a complexidade do mesmo nível.
+\vspace{10pt} % Espaço vertical de 10 pontos
+\par É importante observar que, embora ambos os algoritmos tenham a mesma complexidade, o algoritmo Warshall é mais eficiente em termos de tempo de execução na prática devido à sua abordagem otimizada.
+
+\section{Experimentos}
+
+% Descrição dos experimentos realizados para comparar os algoritmos
+
+\subsection{Configuração dos Experimentos}
+
+Os experimentos foram realizados utilizando os seguintes grafos:
+
+\begin{itemize}
+\item \begin{verbatim}
+Grafo 1: grafo_100.txt
+\end{verbatim}
+
+\item \begin{verbatim}
+Grafo 2: grafo_1000.txt
+\end{verbatim}
+
+\item \begin{verbatim}
+Grafo 3: grafo_10000.txt
+\end{verbatim}
+
+\item \begin{verbatim}
+Grafo 4: grafo_100000.txt
+\end{verbatim}
+\end{itemize}
+
+\par Para cada grafo desses foram criadas 100 vezes mais arestas que o número de vértices e sem arestas repetidas. E ambos os algoritmos foram rodados com um grafo estruturado dentor de uma matriz de adjacência.
+
+\subsection{Resultados}
+
+A Tabela 1 apresenta os tempos de execução dos algoritmos Naive e Warshall para cada um dos grafos:
+
+\begin{table}[H]
+\centering
+\caption{Comparação de tempo de execução dos algoritmos em ms}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|}
+\hline
+\textbf{Grafo (nº de vértices)} & \textbf{Naive (ms)} & \textbf{Warshall (ms)} \\
+\hline\hline\hline
+Grafo 1 (100) & 6.128.300ms & 7.035.100ms \\
+\hline\hline\hline
+Grafo 2 (1000) & 670.149.700ms & 703.510.000ms \\
+\hline\hline\hline
+Grafo 3 (10.000) & tende ao $\infty$ & tende ao $\infty$ \\
+\hline\hline\hline
+Grafo 4 (100.000) & tende ao $\infty$ & tende ao $\infty$ \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Conclusão}
+
+% Conclusão sobre a eficiência e eficácia dos algoritmos Naive e Warshall
+
+
+\par Apesar de ter nos deixado malucos em busca de uma solução que tornasse possível analisar os grafos maiores,  esse trabalho foi uma ótima forma de provar como alguns problemas na computação simplesmente ainda não tem soluções alcançáveis.
+
+\par Após tentarmos diversas vezes ficou evidente que não seria possível alcançar uma solução para os grafos 3 e 4 caso fossem gerados com mais que uma aresta por vértice. A proporção de crescimento cúbica na complexidade dessa solução gera uma impossibilidade para os hardwares de hoje conseguirem concluir os cálculos em um tempo alcançavel.
+
+\par Esperamos ter conseguidos deixar o algoritmo o melhor otimizado o possível para alguém com nossas habilidades.
+
+\section{Referência}
+
+Agradecemos ao professor Zenilton Kleber Gonçalves do Patrocínio Júnior pela orientação neste trabalho.
+
+\end{document}
